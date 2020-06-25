@@ -44,7 +44,7 @@ var attachSaveButtonHandlers = function() {
 // loadLocallyStoredValues
 // load in all of the stored row values
 // and store them in an indexed object
-var loadLocallyStoredValues = function() {
+var loadData= function() {
     for (var i = 0; i <= workHours; i++) {
         var storedString = localStorage.getItem("wks-" + i);
         storedStrings[i] = storedString;
@@ -95,6 +95,8 @@ var createRow = function(row) {
 // setTimeClasses
 // create an array of "past", "present", and "future" strings
 // that corresponds to weather the time of this row is in the past, present or future
+// this array of strings will be used to assign the appropriate class to the timbeblock row
+// which will change the color from gray to red to green
 var setTimeClasses = function(rowNumber) {
     if (rowNumber < current24Hour) {
         statusClass.push("past");
@@ -121,7 +123,7 @@ var disablePastBlocks = function() {
 
 // When the document is done loading, start the program
 $( document ).ready(function() {
-    loadLocallyStoredValues();
+    loadData();
     displayBlocks();
     disablePastBlocks();
     attachSaveButtonHandlers();
