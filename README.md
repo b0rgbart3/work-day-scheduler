@@ -3,6 +3,7 @@
 A simple calendar application that allows the user to save events for each hour of the day. 
 
 <a href="https://b0rgbart3.github.io/work-day-scheduler/">Live Demo</a>
+
 ##Technologies
 This app runs in the browser and features dynamically updated HTML and CSS powered by jQuery.
 
