@@ -1,3 +1,4 @@
+// Javascript written by Bart Dority
 
 //  Get the current day
 //  Display it to the user
@@ -11,7 +12,7 @@ var date = moment().format("dddd, MMMM Do YYYY");  //, h:mm:ss a
 $("#currentDay").text(date);
 
 var currentHour = moment().format("h");
-var current24Hour = 13; //moment().format("HH");
+var current24Hour = moment().format("HH");
 
 var blockDiv = $('#blocks');
 var startHour = 9;
@@ -22,12 +23,15 @@ var storedStrings = {};
 var displayBlocks = function() {
 
     for (var i = 0; i <= workHours; i++) {
-        // Kevin Durrant
-        // create a new row Dom element
+        // create a new row Dom element for each workHour
         createRow(i);
     }
 } 
 
+// attachSaveButtonHandlers
+// respond to button clicks on the save buttons
+// by storing the text area with the matching ID #
+// into LocalStorage
 var attachSaveButtonHandlers = function() {
     $(".saveBtn").click( function(event) {
         var btn = event.target;
@@ -37,6 +41,9 @@ var attachSaveButtonHandlers = function() {
     });
 }
 
+// loadLocallyStoredValues
+// load in all of the stored row values
+// and store them in an indexed object
 var loadLocallyStoredValues = function() {
     for (var i = 0; i <= workHours; i++) {
         var storedString = localStorage.getItem("wks-" + i);
@@ -44,52 +51,65 @@ var loadLocallyStoredValues = function() {
     }
 }
 
-
-var createRow = function(i) {
+// createRow(row)
+// this function generates an entire row Dom element composed of 4 div tags
+// row is the row number (0-8)
+var createRow = function(row) {
         var displayHour;
         var displayHourText;
 
-        if ((startHour + i) < 12) {
-            displayHour = startHour + i;
+        if ((startHour + row) < 12) {
+            displayHour = startHour + row;
             displayHourText = displayHour + " AM";
         } else {
-            if ((startHour + i) == 12) {
+            if ((startHour + row) == 12) {
                 displayHour = 12;
                 displayHourText= "12 PM";
             } else {
-                displayHour = startHour + i -12;
+                displayHour = startHour + row -12;
                 displayHourText = displayHour + " PM";}
              }
         
-        if ((startHour + i) < current24Hour) {
-            statusClass.push("past");
-        }
-        if ((startHour + i) == current24Hour) {
-            statusClass.push("present");
-        }
-        if ((startHour +i) > current24Hour) {
-            statusClass.push( "future" );
-        }
+        setTimeClasses(startHour +row);
         
         var newRow = $("<div class='row'>");
         var newHourLabel = $("<div class='hour col-1 text-right'>"+displayHourText+"</div>");
-        var newTextAreaString = "<div class='col-10'><textarea id='ta-"+i+"'>";
+        var newTextAreaString = "<div class='col-10'><textarea id='ta-"+row+"'>";
         
-        if (storedStrings[i]) {
-            newTextAreaString += storedStrings[i];
+        // If there is a value that we loaded in from Local Storage, then use it
+        if (storedStrings[row]) {
+            newTextAreaString += storedStrings[row];
         }
         newTextAreaString += "</textarea></div>";
 
         var newTextArea = $(newTextAreaString);
-        var newSaveButton=  $("<div class='saveBtn col-1 fas fa-save text-white' data-id='"+i+"'></div>");
+        var newSaveButton=  $("<div class='saveBtn col-1 fas fa-save text-white' data-id='"+row+"'></div>");
 
         blockDiv.append(newRow);
         newRow.append(newHourLabel);      
-        newTextArea.addClass(statusClass[i]);
+        newTextArea.addClass(statusClass[row]);
         newRow.append(newTextArea);
         newRow.append(newSaveButton);
 }
 
+// setTimeClasses
+// create an array of "past", "present", and "future" strings
+// that corresponds to weather the time of this row is in the past, present or future
+var setTimeClasses = function(rowNumber) {
+    if (rowNumber < current24Hour) {
+        statusClass.push("past");
+    }
+    if (rowNumber == current24Hour) {
+        statusClass.push("present");
+    }
+    if (rowNumber > current24Hour) {
+        statusClass.push( "future" );
+    }
+}
+
+// disablePastBlocks
+// If a row time is in the past, let's disable the textarea
+// because we don't need to edit the events of the past
 var disablePastBlocks = function() {
     for (var i = 0; i <= workHours; i++) {
         if (statusClass[i] === "past") {
@@ -98,6 +118,8 @@ var disablePastBlocks = function() {
         }
     }
 }
+
+// When the document is done loading, start the program
 $( document ).ready(function() {
     loadLocallyStoredValues();
     displayBlocks();
